@@ -1,6 +1,8 @@
 // routes/homeRoute.js
 const express = require("express");
 const Home = require("../models/Home"); // your schema
+const Project = require("../models/Projects")
+const Service = require("../models/Service")
 const router = express.Router();
 
 // Utility: get or create the home doc
@@ -12,6 +14,52 @@ const getHomeDoc = async () => {
   }
   return home;
 };
+
+
+
+
+router.get("/home-page/home", async (req, res) => {
+ try {
+    // 1. Get home (just one doc, since you only keep one usually)
+    const home = await Home.findOne();
+
+    // 2. Get latest 3 projects with headings
+    const projectDoc = await Project.findOne();
+    let latestProjects = [];
+    if (projectDoc?.projects?.projectList) {
+      latestProjects = projectDoc.projects.projectList
+        .sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated))
+        .slice(0, 3);
+    }
+    const projectSection = {
+      headings: projectDoc?.projects?.homeHeadings || {},
+      list: latestProjects,
+    };
+
+    // 3. Get latest 3 services with headings
+    const serviceDoc = await Service.findOne();
+    let latestServices = [];
+    if (serviceDoc?.services?.serviceList) {
+      latestServices = serviceDoc.services.serviceList
+        .sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated))
+        .slice(0, 3);
+    }
+    const serviceSection = {
+      headings: serviceDoc?.services?.homeHeadings || {},
+      list: latestServices,
+    };
+
+    res.json({
+      home,
+      projects: projectSection,
+      services: serviceSection,
+    });
+  } catch (error) {
+    console.error("Error fetching home with latest:", error);
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
 
 // ✅ Slider
 router.post("/user/auth/slider", async (req, res) => {
