@@ -9,6 +9,8 @@ const aboutRoute = require("./routes/aboutRoutes")
 const projectRoute = require("./routes/projectRoutes")
 const generalRoute = require("./routes/generalRoutes")
 const serviceRoute = require("./routes/serviceRoutes")
+const messageRoute = require("./routes/messageRoutes")
+const userRoute = require("./routes/userRoutes")
 const connectDB = require("./config/config");
 
 dotenv.config(); // Load environment variables
@@ -40,6 +42,8 @@ app.use('/api/about', aboutRoute);
 app.use('/api/project', projectRoute);
 app.use('/api/service', serviceRoute);
 app.use('/api/general', generalRoute);
+app.use('/api/messages', messageRoute);
+app.use('/api/adminAuth', userRoute);
 // Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
